@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    color: #e8e8f0;
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    padding: 32px 20px;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #4f8ef7, #a855f7, transparent);
+    z-index: 0;
+  }
+  .header-inner {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    background: #0a0a0f;
+    padding: 0 24px;
+  }
+  .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #4f8ef7, #a855f7);
+    color: white;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  h1 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 26px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #4f8ef7 0%, #a855f7 50%, #ec4899 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+  }
+  .subtitle {
+    color: #666;
+    font-size: 11px;
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+
+  .steps-grid { display: flex; flex-direction: column; gap: 16px; }
+
+  .step {
+    background: #111118;
+    border: 1px solid #1e1e2e;
+    border-radius: 12px;
+    padding: 20px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .step:hover { border-color: #4f8ef7; }
+  .step::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .step.blue::before { background: linear-gradient(90deg, #4f8ef7, #60a5fa); }
+  .step.purple::before { background: linear-gradient(90deg, #a855f7, #c084fc); }
+  .step.pink::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
+  .step.green::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+  .step.orange::before { background: linear-gradient(90deg, #f97316, #fb923c); }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .step-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 900;
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .blue .step-num { background: rgba(79,142,247,0.15); color: #4f8ef7; }
+  .purple .step-num { background: rgba(168,85,247,0.15); color: #a855f7; }
+  .pink .step-num { background: rgba(236,72,153,0.15); color: #ec4899; }
+  .green .step-num { background: rgba(34,197,94,0.15); color: #22c55e; }
+  .orange .step-num { background: rgba(249,115,22,0.15); color: #f97316; }
+
+  .step-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #f0f0ff;
+  }
+  .step-emoji { font-size: 18px; margin-left: auto; }
+
+  .step-body { padding-left: 50px; }
+  .step-body p { font-size: 12px; color: #888; line-height: 1.7; margin-bottom: 10px; }
+
+  .code-block {
+    background: #0d0d16;
+    border: 1px solid #1e1e2e;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #a8d8a8;
+    margin-top: 8px;
+    position: relative;
+  }
+  .code-block .comment { color: #555; }
+  .code-block .cmd { color: #4f8ef7; }
+
+  .fields { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .field {
+    display: flex; align-items: center; gap: 10px;
+    background: #0d0d16;
+    border: 1px solid #1e1e2e;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 11px;
+  }
+  .field-key { color: #a855f7; min-width: 120px; }
+  .field-val { color: #e8e8f0; }
+
+  .func-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+  .func-item {
+    background: #0d0d16;
+    border: 1px solid #1e1e2e;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 11px;
+    color: #888;
+  }
+  .func-item span { color: #22c55e; display: block; font-weight: 700; margin-bottom: 2px; }
+
+  .tip {
+    background: rgba(249,115,22,0.08);
+    border: 1px solid rgba(249,115,22,0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 11px;
+    color: #f97316;
+    margin-top: 10px;
+    line-height: 1.6;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 32px;
+    font-size: 10px;
+    color: #333;
+    letter-spacing: 1px;
+  }
+  .footer strong { color: #555; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-inner">
+      <div class="badge">Практическое задание</div>
+      <h1>AI-Прототипирование<br>Telegram-бота</h1>
+      <p class="subtitle">aiogram 3.x · Python · пошаговый гайд</p>
+    </div>
+  </div>
+
+  <div class="steps-grid">
+
+    <!-- Step 1 -->
+    <div class="step blue">
+      <div class="step-header">
+        <div class="step-num">01</div>
+        <div class="step-title">Получите токен в BotFather</div>
+        <div class="step-emoji">🤖</div>
+      </div>
+      <div class="step-body">
+        <p>Откройте Telegram и найдите бота <strong style="color:#4f8ef7">@BotFather</strong>. Отправьте команду <code style="color:#4f8ef7">/newbot</code>, введите имя и username бота (должен заканчиваться на <em>bot</em>). Скопируйте полученный <strong>API Token</strong>.</p>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step purple">
+      <div class="step-header">
+        <div class="step-num">02</div>
+        <div class="step-title">Узнайте свой Telegram ID</div>
+        <div class="step-emoji">🆔</div>
+      </div>
+      <div class="step-body">
+        <p>Напишите боту <strong style="color:#a855f7">@userinfobot</strong> любое сообщение — он ответит вашим числовым ID. Скопируйте его (например: <code style="color:#a855f7">123456789</code>).</p>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step pink">
+      <div class="step-header">
+        <div class="step-num">03</div>
+        <div class="step-title">Настройте файл feedback_bot.py</div>
+        <div class="step-emoji">⚙️</div>
+      </div>
+      <div class="step-body">
+        <p>Откройте скачанный файл и замените 4 значения в самом верху:</p>
+        <div class="fields">
+          <div class="field"><span class="field-key">BOT_TOKEN =</span><span class="field-val">"токен от BotFather"</span></div>
+          <div class="field"><span class="field-key">ADMIN_ID =</span><span class="field-val">ваш числовой ID</span></div>
+          <div class="field"><span class="field-key">AUTHOR_NAME =</span><span class="field-val">"Ваше Имя Фамилия"</span></div>
+          <div class="field"><span class="field-key">AUTHOR_LINK =</span><span class="field-val">"https://t.me/username"</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step green">
+      <div class="step-header">
+        <div class="step-num">04</div>
+        <div class="step-title">Установите библиотеку и запустите</div>
+        <div class="step-emoji">🚀</div>
+      </div>
+      <div class="step-body">
+        <p>Откройте терминал (или консоль Replit) в папке с файлом и выполните:</p>
+        <div class="code-block">
+          <span class="comment"># Установка библиотеки (один раз)</span><br>
+          <span class="cmd">pip install aiogram</span><br><br>
+          <span class="comment"># Запуск бота</span><br>
+          <span class="cmd">python feedback_bot.py</span>
+        </div>
+        <p style="margin-top:10px">Если всё верно, в консоли появится сообщение о старте polling. Бот готов к работе!</p>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step orange">
+      <div class="step-header">
+        <div class="step-num">05</div>
+        <div class="step-title">Отладка ошибок</div>
+        <div class="step-emoji">🐛</div>
+      </div>
+      <div class="step-body">
+        <p>Если бот упал с ошибкой — скопируйте текст из консоли и отправьте в ChatGPT / Claude с запросом:</p>
+        <div class="code-block">
+          <span class="comment">"Исправь ошибку в коде aiogram 3.x:</span><br>
+          <span style="color:#f97316">[вставьте текст ошибки]</span><span class="comment">"</span>
+        </div>
+        <div class="tip">⚠️ Самые частые ошибки: неверный токен (проверьте кавычки), неверный ADMIN_ID (должно быть число без кавычек), или не установлена библиотека aiogram.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Functions -->
+  <div class="step blue" style="margin-top:16px">
+    <div class="step-header">
+      <div class="step-num" style="font-size:18px">✅</div>
+      <div class="step-title">Функционал бота</div>
+    </div>
+    <div class="step-body">
+      <div class="func-list">
+        <div class="func-item"><span>/start</span>Приветствие + кнопки меню</div>
+        <div class="func-item"><span>📝 Оставить заявку</span>Ввод текста → пересылка админу</div>
+        <div class="func-item"><span>ℹ️ Инфо</span>Имя автора + ссылка на профиль</div>
+        <div class="func-item"><span>FSM-состояния</span>Ожидание ввода без конфликтов</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Сгенерировано с помощью <strong>Claude (Anthropic)</strong> · aiogram 3.x · Python 3.9+
+  </div>
+
+</div>
+</body>
+</html>
